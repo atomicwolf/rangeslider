@@ -54,22 +54,22 @@ public struct RangeSlider<T: BinaryFloatingPoint>: View {
     var onValueChanged: (RangeSliderBound, ClosedRange<T>) -> Void
     var describeValue: ((T) -> String?)?
     
-    public var selectedColor: Color = Color.accentColor
-    public var valueColor: Color = Color.primary
-    public var trackColor: Color {
+    private var selectedColor: Color = Color.accentColor
+    private var valueColor: Color = Color.primary
+    private var trackColor: Color {
         get {
             self.colorScheme == .dark ? Color.rangeSliderDarkGray : Color.rangeSliderMediumGray
         }
     }
-    public var handleColor: Color {
+    private var handleColor: Color {
         get {
             self.colorScheme == .dark ? Color.rangeHandleColor : Color.white
         }
     }
-    public var valueFont: Font = Font.system(size: kDefaultValueLabelFontSize)
-    public var trackHeight: CGFloat = kDefaultTrackHeight
-    public var handleWidth: CGFloat = kDefaultHandleWidth
-    public var handleHeight: CGFloat = kDefaultHandleHeight
+    private var valueFont: Font = Font.system(size: kDefaultValueLabelFontSize)
+    private var trackHeight: CGFloat = kDefaultTrackHeight
+    private var handleWidth: CGFloat = kDefaultHandleWidth
+    private var handleHeight: CGFloat = kDefaultHandleHeight
         
     /// Creates a range selection slider using the provided parameters.
     /// - Parameters:
