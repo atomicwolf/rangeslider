@@ -28,7 +28,6 @@ let kDefaultHandleWidth: CGFloat = 15
 let kDefaultHandleHeight: CGFloat = 16
 let kDefaultTrackHeight: CGFloat = 3
 let kDefaultLabelFontSize: CGFloat = 14
-let kDefaultValueLabelFontSize: CGFloat = 12
 
 
 /// Enumeration used to specify which bound is referenced in calls such as
@@ -66,10 +65,13 @@ public struct RangeSlider<T: BinaryFloatingPoint>: View {
             self.colorScheme == .dark ? Color.rangeHandleColor : Color.white
         }
     }
-    private var valueFont: Font = Font.system(size: kDefaultValueLabelFontSize)
+    private var valueFont: Font = Font.system(size: 12)
     private var trackHeight: CGFloat = kDefaultTrackHeight
     private var handleWidth: CGFloat = kDefaultHandleWidth
     private var handleHeight: CGFloat = kDefaultHandleHeight
+    
+    @State private var draggingLeft: Bool = false
+    @State private var draggingRight: Bool = false
         
     /// Creates a range selection slider using the provided parameters.
     /// - Parameters:
@@ -84,31 +86,33 @@ public struct RangeSlider<T: BinaryFloatingPoint>: View {
                  limits: ClosedRange<T>,
                  step: T.Stride = 1,
                  precision: Int = 0,
+                 valueFont: Font = Font.system(size: 14),
                  onValueChanged: @escaping (RangeSliderBound, ClosedRange<T>) -> Void,
                  describeValue: @escaping (T) -> String? = {value in nil}) {
         self._value = value
         self.limits = limits
         self.step = step
         self.precision = precision
+        self.valueFont = valueFont
         self.onValueChanged = onValueChanged
         self.describeValue = describeValue
     }
     
     public var body: some View {
         VStack {
+            HStack {
+                Text(self.describe(value: self.value.lowerBound))
+                    .font(self.valueFont)
+                    .foregroundColor(self.getValueColor(isLower: true))
+                Text(" - ")
+                Text(self.describe(value: self.value.upperBound))
+                    .font(self.valueFont)
+                    .foregroundColor(self.getValueColor(isUpper: true))
+            }
             GeometryReader { geometry in
                 self.renderSlider(with: geometry)
             }
                 .fixedSize(horizontal: false, vertical: true)
-            HStack {
-                Text(self.describe(value: self.value.lowerBound))
-                    .font(self.valueFont)
-                    .foregroundColor(self.valueColor)
-                Text(" - ")
-                Text(self.describe(value: self.value.upperBound))
-                    .font(self.valueFont)
-                    .foregroundColor(self.valueColor)
-            }
         }
     }
     
@@ -117,7 +121,11 @@ public struct RangeSlider<T: BinaryFloatingPoint>: View {
          Drag gesntures to let the user change the lower and upper range values.
          */
         let leftDragGesture = DragGesture(minimumDistance: 1, coordinateSpace: .local)
+            .onEnded { mouse in
+                self.draggingLeft = false
+            }
             .onChanged { mouse in
+                self.draggingLeft = true
                 guard mouse.location.x >= 0 &&
                     mouse.location.x <= self.offset(of: self.value.upperBound, in: geometry)
                 else {
@@ -131,7 +139,11 @@ public struct RangeSlider<T: BinaryFloatingPoint>: View {
         }
 
         let rightDragGesture = DragGesture(minimumDistance: 1, coordinateSpace: .local)
+            .onEnded { mouse in
+                self.draggingRight = false
+            }
             .onChanged { mouse in
+                self.draggingRight = true
                 guard mouse.location.x >= self.offset(of: self.value.lowerBound - abs(self.limits.lowerBound), in: geometry) &&
                     mouse.location.x <= geometry.size.width else {
                     return
@@ -253,6 +265,16 @@ public struct RangeSlider<T: BinaryFloatingPoint>: View {
             return String(Int(value))
         }
     }
+    
+    func getValueColor (isLower: Bool = false, isUpper: Bool = false) -> Color {
+        if isLower && self.draggingLeft {
+            return Color.green
+        }
+        if isUpper && self.draggingRight {
+            return Color.green
+        }
+        return self.valueColor
+    }
 }
 
 // MARK: - RangeIndicator -
@@ -260,6 +282,9 @@ public struct RangeSlider<T: BinaryFloatingPoint>: View {
 /// RangeSliderHandle is used to render a single "handle" that the user can tap/click and
 /// drag or swipe to change a range's lower or upper bound value.
 
+#if os(iOS)
+typealias RangeSliderHandle = Circle
+#else
 struct RangeSliderHandle: Shape {
         
     let radius: CGFloat = 4
@@ -287,6 +312,7 @@ struct RangeSliderHandle: Shape {
         return path
     }
 }
+#endif
 
 struct RangeSlider_Previews: PreviewProvider {
     static var previews: some View {
