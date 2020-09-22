@@ -48,6 +48,7 @@ public enum RangeSliderBound {
 public struct RangeSlider<T: BinaryFloatingPoint>: View {
     
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.isEnabled) private var isEnabled
 
     @Binding var value: ClosedRange<T>
     var limits: ClosedRange<T>
@@ -66,7 +67,10 @@ public struct RangeSlider<T: BinaryFloatingPoint>: View {
     }
     private var handleColor: Color {
         get {
-            self.colorScheme == .dark ? Color.rangeHandleColor : Color.white
+            if self.isEnabled {
+                return self.colorScheme == .dark ? Color.rangeHandleColor : Color.white
+            }
+            return Color.gray
         }
     }
     private var valueFont: Font = Font.system(size: 12)
@@ -271,6 +275,10 @@ public struct RangeSlider<T: BinaryFloatingPoint>: View {
     }
     
     func getValueColor (isLower: Bool = false, isUpper: Bool = false) -> Color {
+        if !isEnabled {
+            return Color.gray
+        }
+        
         if isLower && self.draggingLeft {
             return Color.green
         }
