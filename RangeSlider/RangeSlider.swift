@@ -24,7 +24,11 @@
 
 import SwiftUI
 
+#if os(macOS)
 let kDefaultHandleWidth: CGFloat = 15
+#else
+let kDefaultHandleWidth: CGFloat = 22
+#endif
 let kDefaultHandleHeight: CGFloat = 16
 let kDefaultTrackHeight: CGFloat = 3
 let kDefaultLabelFontSize: CGFloat = 14
