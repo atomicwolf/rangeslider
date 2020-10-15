@@ -2,6 +2,12 @@
 
 RangeSlider is a SwiftUI control that can be used to specify a range of values. It is designed to fit in seamlessly with other SwiftUI controls (in terms of apperance).
 
+Releases
+
+1.0.1 - Fix handling step values > 1.
+
+1.0 - Initial release
+
 ## License
 
 MIT

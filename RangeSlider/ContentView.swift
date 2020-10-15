@@ -29,7 +29,7 @@ enum Month: Float, Comparable {
     }
     
     static func < (lhs: Month, rhs: Month) -> Bool {
-        return lhs < rhs
+        return lhs.rawValue < rhs.rawValue
     }
     
     static var allValues: [Month] =
@@ -54,11 +54,11 @@ struct ContentView: View {
     @State private var sliderVal: Float = 34
     @State private var sliderVal2: Float = 3
 
-    @State private var yearRange: ClosedRange<Float> = 1972...2015
-    @State private var valueRange: ClosedRange<Float> = 4...11
+    @State private var yearRange: ClosedRange<Float> = 1975...2015
+    @State private var valueRange: ClosedRange<Float> = 4...12
     @State private var floatRange: ClosedRange<Float> = 41...80
     @State private var floatRange2: ClosedRange<Float> = 8...15
-    @State private var monthRange: ClosedRange<Float> = 3...7
+    @State private var monthRange: ClosedRange<Float> = 2...8
 
     var body: some View {
         VStack {
@@ -81,6 +81,7 @@ struct ContentView: View {
             RangeSlider(
                 self.$yearRange,
                 limits: 1965...2040,
+                step: 5,
                 onValueChanged: { (bound, value) in
                     print ("value changed: \(String(describing: value))")
                 })
@@ -98,6 +99,7 @@ struct ContentView: View {
             RangeSlider(
                 self.$floatRange,
                 limits: 10...105,
+                step: 2.5,
                 precision: 2,
                 onValueChanged: { (bound, value) in
                     print ("value changed: \(String(describing: value))")
@@ -107,6 +109,7 @@ struct ContentView: View {
             RangeSlider(
                 self.$monthRange,
                 limits: 1...12,
+                step: 1,
                 onValueChanged: { (bound, value) in
                     print ("value changed: \(String(describing: value))")
                 },

@@ -53,7 +53,7 @@ public struct RangeSlider<T: BinaryFloatingPoint>: View {
     @Binding var value: ClosedRange<T>
     var limits: ClosedRange<T>
     var label: String?
-    var step: T.Stride
+    var step: T = 1
     var precision: Int = 0
     var onValueChanged: (RangeSliderBound, ClosedRange<T>) -> Void
     var describeValue: ((T) -> String?)?
@@ -92,7 +92,7 @@ public struct RangeSlider<T: BinaryFloatingPoint>: View {
     ///   - describeValue: Optional. Called whenever a value needs to be described for display.
     public init (_ value: Binding<ClosedRange<T>>,
                  limits: ClosedRange<T>,
-                 step: T.Stride = 1,
+                 step: T = 1,
                  precision: Int = 0,
                  valueFont: Font = Font.system(size: 14),
                  onValueChanged: @escaping (RangeSliderBound, ClosedRange<T>) -> Void,
@@ -139,9 +139,11 @@ public struct RangeSlider<T: BinaryFloatingPoint>: View {
                 else {
                     return
                 }
-                let newLowerBound =
+                var newLowerBound =
                     Float.minimum(Float(self.limits.lowerBound) + Float(self.offsetToStride(mouse.location.x, in: geometry)),
                         Float(self.value.upperBound))
+                newLowerBound = newLowerBound.roundToNearest(multipleOf: Float(self.step))
+                
                 self.value = T(self.roundValue(Double(newLowerBound), places: self.precision))...self.value.upperBound
                 self.onValueChanged(.lower, self.value)
         }
@@ -160,6 +162,7 @@ public struct RangeSlider<T: BinaryFloatingPoint>: View {
                                             Double(self.limits.lowerBound +
                                                     self.offsetToStride(mouse.location.x, in: geometry)),
                                             places: self.precision)
+                newUpperBound = newUpperBound.roundToNearest(multipleOf: self.step)
                 if newUpperBound < self.value.lowerBound {
                     newUpperBound = self.value.lowerBound
                 }
@@ -359,5 +362,11 @@ fileprivate extension Color {
 
     static var rangeSliderMediumGray: Color {
        get { return Color.init(red: 0.72, green: 0.72, blue: 0.72) }
+    }
+}
+
+extension BinaryFloatingPoint {
+    func roundToNearest(multipleOf m: Self) -> Self {
+        return m * Self(Int ( (self / m).rounded() ))
     }
 }
